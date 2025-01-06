@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rain Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            color: white;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                              url('abid-shah-GSgGDBJKPiA-unsplash.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .Companies {
+            font-size: 56px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        form {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1 class="Companies">
+        RANDRIA INDUSTRIES 
+    </h1>
+    <h1>Rain Prediction</h1>
+    <h2>Enter Weather Data</h2>
+    <form id="predictionForm">
+        <label for="Temp">Temperature (°C)</label>
+        <input id="Temp" type="number" name="Temp" required step="0.1">
+
+        <label for="Humidity">Humidity (%)</label>
+        <input id="Humidity" type="number" name="Humidity" required step="0.1">
+
+        <label for="Wind">Wind Speed (km/h)</label>
+        <input id="Wind" type="number" name="Wind" required step="0.1">
+
+        <label for="Cloud">Cloud Cover (%)</label>
+        <input id="Cloud" type="number" name="Cloud" required step="0.1">
+
+        <label for="Pressure">Pressure (hPa)</label>
+        <input id="Pressure" type="number" name="Pressure" required step="0.1">
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const temp = parseFloat(document.getElementById("Temp").value);
+            const humidity = parseFloat(document.getElementById("Humidity").value);
+            const wind = parseFloat(document.getElementById("Wind").value);
+            const cloud = parseFloat(document.getElementById("Cloud").value);
+            const pressure = parseFloat(document.getElementById("Pressure").value);
+
+            const payload = {
+                temperature: temp,
+                humidity: humidity,
+                wind_speed: wind,
+                cloud_cover: cloud,
+                pressure: pressure
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                const resultDiv = document.getElementById('result');
+                if (response.ok) {
+                    resultDiv.textContent = `Prediction: ${data.prediction}`;
+                    resultDiv.style.color = "green";
+                } else {
+                    resultDiv.textContent = `Error: ${data.detail}`;
+                    resultDiv.style.color = "red";
+                }
+            } catch (error) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.textContent = `An error occurred: ${error.message}`;
+                resultDiv.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>
